@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mezotrix — Login</title>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="login-body">
+<div class="login-card">
+  <img src="/img/mezotrix-logo.png" alt="Mezotrix" class="login-logo">
+  <p class="login-sub">Financial Reporting Portal</p>
+  <form id="loginForm">
+    <input type="password" id="password" placeholder="Enter password" autocomplete="current-password" required>
+    <button type="submit">Sign In</button>
+    <p id="loginError" class="error-msg"></p>
+  </form>
+</div>
+<script>
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const errEl = document.getElementById('loginError');
+  errEl.textContent = '';
+  try {
+    const res = await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: document.getElementById('password').value }),
+    });
+    if (res.ok) {
+      window.location.href = '/dashboard.html';
+    } else {
+      errEl.textContent = 'Invalid password';
+    }
+  } catch {
+    errEl.textContent = 'Connection error';
+  }
+});
+fetch('/api/me').then(r => { if (r.ok) window.location.href = '/dashboard.html'; });
+</script>
+</body>
+</html>
