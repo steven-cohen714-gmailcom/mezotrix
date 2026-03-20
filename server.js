@@ -13,6 +13,16 @@ const { getArAging } = require('./src/queries/ar-aging');
 const { getTopExpenses } = require('./src/queries/top-expenses');
 const { getProductLookup } = require('./src/queries/product-lookup');
 const { searchProducts, searchDebtors, searchCreditors } = require('./src/queries/search');
+const { handleChat } = require('./src/chat');
+const fs = require('fs');
+
+const SAVED_REPORTS_FILE = path.join(__dirname, 'data', 'saved-reports.json');
+function loadSavedReports() {
+  try { return JSON.parse(fs.readFileSync(SAVED_REPORTS_FILE, 'utf8')); } catch { return []; }
+}
+function saveSavedReports(reports) {
+  fs.writeFileSync(SAVED_REPORTS_FILE, JSON.stringify(reports, null, 2));
+}
 
 const app = express();
 app.use(express.json());
@@ -132,6 +142,54 @@ app.get('/api/report/product-lookup', requireAuth, async (req, res) => {
   } catch (err) {
     console.error('Product lookup error:', err);
     res.status(500).json({ error: 'Failed to run product lookup' });
+  }
+});
+
+// Saved reports CRUD
+app.get('/api/saved-reports', requireAuth, (req, res) => {
+  res.json(loadSavedReports());
+});
+
+app.post('/api/saved-reports', requireAuth, (req, res) => {
+  const { title, description, question, categoryId, categoryTitle, categoryIcon } = req.body;
+  if (!title || !question) {
+    return res.status(400).json({ error: 'title and question required' });
+  }
+  const reports = loadSavedReports();
+  const report = {
+    id: 'saved-' + Date.now(),
+    title,
+    description: description || question,
+    question,
+    categoryId: categoryId || 'ai-reports',
+    categoryTitle: categoryTitle || 'AI Reports',
+    categoryIcon: categoryIcon || '\u{1F916}',
+    createdAt: new Date().toISOString(),
+  };
+  reports.push(report);
+  saveSavedReports(reports);
+  res.json(report);
+});
+
+app.delete('/api/saved-reports/:id', requireAuth, (req, res) => {
+  let reports = loadSavedReports();
+  reports = reports.filter(r => r.id !== req.params.id);
+  saveSavedReports(reports);
+  res.json({ ok: true });
+});
+
+// Chat endpoint
+app.post('/api/chat', requireAuth, async (req, res) => {
+  try {
+    const { messages } = req.body;
+    if (!messages || !Array.isArray(messages) || messages.length === 0) {
+      return res.status(400).json({ error: 'messages array required' });
+    }
+    const reply = await handleChat(messages);
+    res.json({ reply });
+  } catch (err) {
+    console.error('Chat error:', err.message, err.status, err);
+    res.status(500).json({ error: err.message || 'Failed to process chat message' });
   }
 });
 

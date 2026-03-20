@@ -132,6 +132,12 @@ async function runReport(reportId) {
   const def = REPORT_DEFS.find(r => r.id === reportId);
   if (!def) return;
 
+  // Saved chat reports use the chat API + modal
+  if (def.isSavedChat) {
+    window.runSavedChatReport(reportId);
+    return;
+  }
+
   const from = document.querySelector(`[data-from="${reportId}"]`).value;
   const to = document.querySelector(`[data-to="${reportId}"]`).value;
   const compareEl = document.querySelector(`[data-compare="${reportId}"]`);

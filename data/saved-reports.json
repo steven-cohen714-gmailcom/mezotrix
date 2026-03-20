@@ -1,0 +1,22 @@
+[
+  {
+    "id": "saved-1773982205579",
+    "title": "Top 5 selling items",
+    "description": "whats my top 5 selling items",
+    "question": "whats my top 5 selling items",
+    "categoryId": "overview",
+    "categoryTitle": "KPI Dashboard",
+    "categoryIcon": "🤖",
+    "createdAt": "2026-03-20T04:50:05.579Z"
+  },
+  {
+    "id": "saved-1773989304486",
+    "title": "Tope 5 items for Feb",
+    "description": "whet were my top 5 selling items in feb 26",
+    "question": "whet were my top 5 selling items in feb 26",
+    "categoryId": "overview",
+    "categoryTitle": "KPI Dashboard",
+    "categoryIcon": "🤖",
+    "createdAt": "2026-03-20T06:48:24.486Z"
+  }
+]
